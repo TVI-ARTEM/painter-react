@@ -1,40 +1,40 @@
-import React, {FC, ReactElement, useEffect, useRef, useState} from 'react';
+import React, {FC, ReactElement, useContext, useEffect, useState} from 'react';
 import Cell from "./Cell/Cell";
+import {CanvasContext} from "../CanvasContextProvider";
 
 interface BoardProps {
     width: number,
     height: number,
-    color: string,
 }
 
-const BIG_BOARD_SIZE = 400;
-const SMALL_BOARD_SIZE = 300;
-const BOARD_SIZE = window.innerWidth > 530 ? BIG_BOARD_SIZE : SMALL_BOARD_SIZE;
 
-const Board: FC<BoardProps> = ({width, height, color}) => {
-    const [cells, setCells] = useState<ReactElement[]>([]);
+const BOARD_SIZE = 750;
 
-
+const Board: FC<BoardProps> = ({width, height}) => {
+    const [cellRender, setCellsRender] = useState<ReactElement[]>()
     useEffect(() => {
         const cellsArr = []
         for (let i = 0; i < width * height; i++) {
             const cellSize = BOARD_SIZE / width
-            cellsArr.push(<Cell size={cellSize} color={"#FFF"} key={i}/>)
+            cellsArr.push(<Cell size={cellSize} index={i} key={i}/>)
 
         }
-        console.log(cellsArr)
-        setCells(cellsArr)
-    }, [width, height])
+        setCellsRender(cellsArr)
+    }, [height, width])
 
 
     return (
+
         <div style={{
             display: "inline-grid",
-            gridTemplateColumns: `repeat(${width},1fr)`
+            gridTemplateColumns: `repeat(${width},1fr)`,
+            width: `${BOARD_SIZE}px`,
+            height: `${BOARD_SIZE}px`,
+            overflow: "auto"
         }}
-        >
-            {cells}
+        > {cellRender}
         </div>
+
     );
 };
 

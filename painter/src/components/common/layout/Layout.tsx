@@ -9,14 +9,14 @@ interface Props {
 
 export const Layout: React.FC<Props> = ({top, left, middle, right}) => {
     return (
-        <>
+        <div>
             <div
                 style={{
                     width: "100%",
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
-                    color: "#ADADAD"
+                    color: "#DFDFDF"
                 }}
             >
                 <div style={{flex: 0, height: 48, zIndex: 100}}>
@@ -75,7 +75,7 @@ export const Layout: React.FC<Props> = ({top, left, middle, right}) => {
             >
                 <div
                     style={{
-                        backgroundColor: "#1E1E1E",
+                        backgroundColor: "#DFDFDF",
                         width: "100%",
                         height: "100%",
                         boxShadow: "inset 0px 0px 5px 0px rgba(0, 0, 0, 0.4)"
@@ -84,6 +84,6 @@ export const Layout: React.FC<Props> = ({top, left, middle, right}) => {
                     {middle}
                 </div>
             </div>
-        </>
+        </div>
     );
 };

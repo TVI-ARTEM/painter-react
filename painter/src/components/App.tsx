@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import '../styles/App.css';
 import {BrowserRouter} from "react-router-dom";
 import AppRouter from "./AppRouter";
 

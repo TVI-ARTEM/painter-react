@@ -1,19 +1,19 @@
-import {FC, useState} from "react";
+import {useContext} from "react";
 import Board from "./Board/Board";
+import "./Canvas.css"
+import {CanvasContext} from "./CanvasContextProvider";
 
-interface BoardProps {
-    width: number,
-    height: number,
-}
 
-const Canvas: FC<BoardProps> = ({width, height}) => {
-    const [color, setColor] = useState<string>('#eb9010')
+const Canvas = () => {
+    const {width} = useContext(CanvasContext)
 
     return (
-        <div className='canvas'>
-            <Board color={color} width={width} height={height}/>
+        <div className="canvas">
+            <Board width={width} height={width}/>
         </div>
     );
 };
 
 export default Canvas;
+
+

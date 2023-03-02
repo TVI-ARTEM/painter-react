@@ -1,16 +1,24 @@
-import React, {FC} from 'react';
+import React, {FC, useContext, useState} from 'react';
+import {CanvasContext} from "../../CanvasContextProvider";
 
 interface CellProps {
     size: number,
-    color: string,
+    index: number
 }
 
-const Cell: FC<CellProps> = ({size, color}) => {
+const Cell: FC<CellProps> = ({size, index}) => {
+    const {cells, setCells} = useContext(CanvasContext)
+
 
     return (
         <div
-            style={{width: `${size}px`, height: `${size}px`, backgroundColor: color}}
-            onMouseDown={() => console.log('down')}
+            style={{width: `${size}px`, height: `${size}px`, backgroundColor: `${cells[index]}`}}
+            onMouseDown={() => {
+                let celll = [...cells]
+                celll[index] = "#FAA"
+                setCells(celll)
+            }
+            }
         />
     );
 };
