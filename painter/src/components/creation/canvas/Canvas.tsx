@@ -1,7 +1,7 @@
 import {useContext} from "react";
 import Board from "./Board/Board";
 import "./Canvas.css"
-import {CanvasContext} from "./CanvasContextProvider";
+import {CanvasContext} from "./provider/CanvasContextProvider";
 
 
 const Canvas = () => {

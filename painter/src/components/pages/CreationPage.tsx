@@ -5,7 +5,7 @@ import {Layout} from "../common/layout/Layout";
 import {Tools} from "../creation/tools";
 import {Menu} from "../common/menu";
 import Canvas from "../creation/canvas/Canvas";
-import {CanvasContextProvider} from "../creation/canvas/CanvasContextProvider";
+import {CanvasContextProvider} from "../creation/canvas/provider/CanvasContextProvider";
 
 
 const CreationPage = observer(() => {

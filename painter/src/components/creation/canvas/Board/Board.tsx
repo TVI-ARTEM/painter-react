@@ -1,6 +1,6 @@
 import React, {FC, ReactElement, useContext, useEffect, useState} from 'react';
 import Cell from "./Cell/Cell";
-import {CanvasContext} from "../CanvasContextProvider";
+import {CanvasContext} from "../provider/CanvasContextProvider";
 
 interface BoardProps {
     width: number,
@@ -12,15 +12,16 @@ const BOARD_SIZE = 750;
 
 const Board: FC<BoardProps> = ({width, height}) => {
     const [cellRender, setCellsRender] = useState<ReactElement[]>()
+    const {zoom} = useContext(CanvasContext)
     useEffect(() => {
         const cellsArr = []
         for (let i = 0; i < width * height; i++) {
-            const cellSize = BOARD_SIZE / width
+            const cellSize = zoom * BOARD_SIZE / width
             cellsArr.push(<Cell size={cellSize} index={i} key={i}/>)
 
         }
         setCellsRender(cellsArr)
-    }, [height, width])
+    }, [height, width, zoom])
 
 
     return (
