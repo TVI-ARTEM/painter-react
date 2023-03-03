@@ -5,11 +5,11 @@ import {CanvasContext} from "./provider/CanvasContextProvider";
 
 
 const Canvas = () => {
-    const {width} = useContext(CanvasContext)
+    const {project} = useContext(CanvasContext)
 
     return (
         <div className="canvas">
-            <Board width={width} height={width}/>
+            <Board width={project.width} height={project.width}/>
         </div>
     );
 };

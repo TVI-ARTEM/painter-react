@@ -48,7 +48,7 @@ export const Layout: React.FC<Props> = ({top, left, middle, right}) => {
                             flex: 1
                         }}
                     />
-                    <div style={{flex: 0, maxWidth: 48, minWidth: 48, zIndex: 100}}>
+                    <div style={{flex: 0, maxWidth: 80, minWidth: 80, zIndex: 100}}>
                         <div
                             style={{
                                 backgroundColor: "#2A2D2E",
@@ -78,7 +78,7 @@ export const Layout: React.FC<Props> = ({top, left, middle, right}) => {
                         backgroundColor: "#DFDFDF",
                         width: "100%",
                         height: "100%",
-                        boxShadow: "inset 0px 0px 5px 0px rgba(0, 0, 0, 0.4)"
+                        boxShadow: "inset 0px 0px 5px 0px rgba(0, 0, 0, 0.4)",
                     }}
                 >
                     {middle}

@@ -8,7 +8,7 @@ interface BoardProps {
 }
 
 
-const BOARD_SIZE = 750;
+const BOARD_SIZE = window.screen.width > 500 ? window.screen.width > 750 ? window.screen.width > 1000 ? 750 : 400 : 250 : 150;
 
 const Board: FC<BoardProps> = ({width, height}) => {
     const [cellRender, setCellsRender] = useState<ReactElement[]>()
@@ -33,6 +33,8 @@ const Board: FC<BoardProps> = ({width, height}) => {
             height: `${BOARD_SIZE}px`,
             overflow: "auto"
         }}
+             onDragStart={(e) => e.preventDefault()}
+             onContextMenu={(e) => e.preventDefault()}
         > {cellRender}
         </div>
 
