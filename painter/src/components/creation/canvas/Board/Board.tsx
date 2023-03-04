@@ -8,7 +8,7 @@ interface BoardProps {
 }
 
 
-const BOARD_SIZE = window.screen.width > 500 ? window.screen.width > 750 ? window.screen.width > 1000 ? 750 : 400 : 250 : 150;
+const BOARD_SIZE = window.screen.width > 500 ? window.screen.width > 750 ? window.screen.width > 1000 ? 600 : 400 : 250 : 150;
 
 const Board: FC<BoardProps> = ({width, height}) => {
     const [cellRender, setCellsRender] = useState<ReactElement[]>()

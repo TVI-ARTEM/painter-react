@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fontsource/vt323": "^4.5.10",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -12,6 +13,8 @@
     "@types/react-dom": "^18.0.11",
     "bootstrap": "^5.2.3",
     "easy-peasy": "^5.2.0",
+    "gif.js.optimized": "^1.0.1",
+    "gifshot": "^0.4.5",
     "mobx-react-lite": "^3.4.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",

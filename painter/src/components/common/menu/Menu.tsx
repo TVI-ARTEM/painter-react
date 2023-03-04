@@ -1,25 +1,31 @@
 import React from "react";
 import "./Menu.css";
-import { Logo } from "./Logo";
-import { FileMenu } from "./FileMenu";
+import "../../../index.css";
+import {Stack} from "react-bootstrap";
+import LogoVorona from "../images/vorona.png";
+import {SignIn} from "./SignIn";
+import {SignUp} from "./SignUp";
+import canvas from "../../creation/canvas/Canvas";
 
-interface Props {}
+interface Props {
+}
 
 export const Menu: React.FC<Props> = () => {
-  return (
-    <div
-      style={{
-        height: "100%",
-        display: "inline-flex",
-        alignItems: "center"
-      }}
-    >
-      <div className={"Menu-items"}>
-        <Logo />
-      </div>
-      <FileMenu />
-      <button className={"Menu-items Menu-button"}>Edit</button>
-      <button className={"Menu-items Menu-button"}>Help</button>
-    </div>
-  );
+    return (
+        <Stack direction="horizontal">
+            <img src={LogoVorona} style={{width: "5%", aspectRatio: 1, marginLeft: "50px"}} alt={""}/>
+
+            <p className={"Text-Header1"} style={{color: "white", margin: 0}}>Pixelshop</p>
+
+            <div className={"ms-auto"}
+                 style={{marginRight: "10px"}}>
+                <SignIn/>
+            </div>
+            <div style={{marginRight: "50px"}}>
+                <SignUp/>
+            </div>
+
+
+        </Stack>
+    );
 };

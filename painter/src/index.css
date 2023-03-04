@@ -7,4 +7,24 @@ html {
     resize: none;
 }
 
+.Text-Header1 {
+    font-family: "VT323", serif;
+    font-size: 48px;
+}
+
+.Text-Header2 {
+    font-family: "VT323", serif;
+    font-size: 38px;
+}
+
+.Text-Regular {
+    font-family: "VT323", serif;
+    font-size: 24px;
+}
+
+.Pixel-Button {
+    background-image: url("components/common/images/ButtonBackground.svg");
+    background-size: cover;
+}
+
 

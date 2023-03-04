@@ -19,24 +19,32 @@ export const Layout: React.FC<Props> = ({top, left, middle, right}) => {
                     color: "#DFDFDF"
                 }}
             >
-                <div style={{flex: 0, height: 48, zIndex: 100}}>
+                <div style={{flex: 0, height: 100, zIndex: 100}}>
                     <div
                         style={{
-                            backgroundColor: "#333333",
+                            backgroundColor: "#161616",
                             width: "100%",
-                            height: "100%"
+                            height: "100%",
+                            borderRadius: "0px 0px 25px 25px"
                         }}
                     >
                         {top}
                     </div>
                 </div>
+
+                <br/>
+                <br/>
+                <br/>
+
                 <div style={{flex: 1, display: "flex"}}>
-                    <div style={{flex: 0, maxWidth: 64, minWidth: 64, zIndex: 100}}>
+                    <div style={{flex: 0, maxWidth: 80, minWidth: 80, zIndex: 100}}>
                         <div
                             style={{
-                                backgroundColor: "#2A2D2E",
+                                backgroundColor: "#EFEFEF",
                                 width: "100%",
                                 height: "100%",
+                                borderRadius: "0px 30px 30px 0px",
+                                border: `4px solid #4C4C4C`,
                                 boxShadow: "rgba(0, 0, 0, 0.4) 0px 5px 10px -10px inset"
                             }}
                         >
@@ -51,9 +59,11 @@ export const Layout: React.FC<Props> = ({top, left, middle, right}) => {
                     <div style={{flex: 0, maxWidth: 80, minWidth: 80, zIndex: 100}}>
                         <div
                             style={{
-                                backgroundColor: "#2A2D2E",
+                                backgroundColor: "#EFEFEF",
                                 width: "100%",
                                 height: "100%",
+                                borderRadius: "30px 0px 0px 30px",
+                                border: `4px solid #4C4C4C`,
                                 boxShadow: "rgba(0, 0, 0, 0.4) 0px 5px 10px -10px inset"
                             }}
                         >
@@ -61,14 +71,18 @@ export const Layout: React.FC<Props> = ({top, left, middle, right}) => {
                         </div>
                     </div>
                 </div>
+
+                <br/>
+                <br/>
+                <br/>
             </div>
 
             <div
                 style={{
                     bottom: "0px",
-                    left: "64px",
-                    right: "48px",
-                    top: "48px",
+                    left: "80px",
+                    right: "80px",
+                    top: "24px",
                     position: "fixed",
                     display: "block"
                 }}
@@ -78,7 +92,6 @@ export const Layout: React.FC<Props> = ({top, left, middle, right}) => {
                         backgroundColor: "#DFDFDF",
                         width: "100%",
                         height: "100%",
-                        boxShadow: "inset 0px 0px 5px 0px rgba(0, 0, 0, 0.4)",
                     }}
                 >
                     {middle}
