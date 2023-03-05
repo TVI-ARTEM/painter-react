@@ -1,6 +1,6 @@
 import {ARTWORK_ROUTE, CREATION_ROUTE, MAIN_ROUTE, PROFILE_ROUTE} from "../utils/consts";
 import MainPage from "./pages/MainPage";
-import CreationPage from "./pages/CreationPage";
+import CreationPage from "./pages/creationPage/CreationPage";
 import ProfilePage from "./pages/ProfilePage";
 import ArtworkPage from "./pages/ArtworkPage";
 

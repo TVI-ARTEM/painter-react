@@ -1,21 +1,15 @@
 import React from 'react';
 import {observer} from "mobx-react-lite";
-import {Col, Container, Row, Navbar} from "react-bootstrap";
+import {Menu} from "../common/menu";
 
 const MainPage  = observer(() => {
 
     return (
-        <>
-            <Navbar fixed={'top'} bg={'dark'}>
-                <Container fluid>
-                    <Navbar.Brand className={'roboto-text-regular'}/>
-
-                </Container>
-            </Navbar>
-            <br/>
+        <div style={{backgroundColor: "#DFDFDF"}}>
+            <Menu/>
             MAIN
 
-        </>)
+        </div>)
 })
 
 export default MainPage;

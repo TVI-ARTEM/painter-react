@@ -1,0 +1,15 @@
+services:
+  painter_db:
+    container_name: painter_db
+    image: postgres:14.5
+    restart: always
+    environment:
+      POSTGRES_DB: "painter_db"
+      POSTGRES_USER: "painter_user"
+      POSTGRES_PASSWORD: "painter_password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./docker/db/scripts/initialize.sql:/docker-entrypoint-initdb.d/initialize.sql
+      - ./dz:/var/lib/postgresql/data
+    ports:
+      - "6002:5432"
