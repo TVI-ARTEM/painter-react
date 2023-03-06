@@ -131,13 +131,28 @@ class UserController {
         }
     }
 
+    async getAll(req: Request, res: Response, next: NextFunction) {
+        try {
+            console.log("get-all")
+            const users = await User.findAll()
+            const usersJSON = JSON.stringify(users.map(it => JSON.stringify({
+                email: it.email,
+                nickname: it.nickname
+            })))
+
+            return res.json({message: 'Get is successful', users: usersJSON})
+        } catch (e) {
+            return next(e)
+        }
+    }
+
 
     async update(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log('update12')
+            console.log('update')
             const {email, nickname} = req.body
 
-            if (!email || !nickname ) {
+            if (!email || !nickname) {
                 return next(ApiError.badRequest('Incorrect e-mail, nickname or password!'))
             }
 

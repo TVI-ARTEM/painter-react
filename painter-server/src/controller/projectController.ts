@@ -1,9 +1,11 @@
 import {Request, Response, NextFunction} from 'express';
-import {User, Project, Like, Tag} from '../models/models';
+import {User, Project, Like} from '../models/models';
 import ApiError from "../error/ApiError";
+import {Op, where} from "sequelize";
 
 
 class ProjectController {
+
     async create(req: Request, res: Response, next: NextFunction) {
         try {
             const {email, name, description, width, frames, published} = req.body
@@ -30,6 +32,9 @@ class ProjectController {
             if (!user) {
                 return next(ApiError.badRequest('User is not found!'))
             }
+
+            //const urls = JSON.stringify(createGifCustom(width, JSON.parse(frames) as String[][]))
+
             const project = await Project.create({
                 name: name,
                 width: width,
@@ -78,6 +83,7 @@ class ProjectController {
             if (!project) {
                 return next(ApiError.badRequest('Project is not found!'))
             }
+
 
             await Project.update({
                 name: name,
@@ -130,18 +136,65 @@ class ProjectController {
             if (!project) {
                 return next(ApiError.badRequest('Project is not found!'))
             }
-
             const projectJson = JSON.stringify({
                 name: project.name,
                 width: project.width,
-                frames: JSON.parse(project.frameJson) as String[][],
+                frames: JSON.parse(project.frameJson) as String[],
                 description: project.description,
                 published: project.published,
                 index: project.id
             })
 
             const user = await User.findOne({where: {id: project.userId}})
-            return res.json({message: 'Get is successful', project: projectJson, nickname: user.nickname})
+            const likes = await Like.findAll({where: {projectId: project.id}})
+            const liked = await Like.findOne({where: {projectId: project.id, userId: user.id}})
+            let liked_res = true
+            if (!liked) {
+                liked_res = false
+            }
+            return res.json({
+                message: 'Get is successful',
+                project: projectJson,
+                nickname: user.nickname,
+                likes: likes.length,
+                liked: liked_res
+            })
+        } catch (e) {
+            return next(e)
+        }
+    }
+
+    async like(req: Request, res: Response, next: NextFunction) {
+        try {
+            console.log("like")
+            const {id, nickname} = req.body
+
+
+            const project = await Project.findOne({where: {id: id}})
+            if (!project) {
+                return next(ApiError.badRequest('Project is not found!'))
+            }
+
+            const user = await User.findOne({where: {nickname: nickname}})
+            if (!user) {
+                return next(ApiError.badRequest('User is not found!'))
+            }
+
+            const like = await Like.findOne({where: {userId: user.id, projectId: project.id}})
+            if (like) {
+                await Like.destroy({where: {userId: user.id}})
+            } else {
+                await Like.create({
+                    userId: user.id,
+                    projectId: project.id,
+                }).catch(error => {
+                    next(error)
+                })
+            }
+
+            const likes = await Like.findAll({where: {projectId: project.id}})
+
+            return res.json({message: 'Get is successful', likes: likes.length})
         } catch (e) {
             return next(e)
         }
@@ -151,7 +204,7 @@ class ProjectController {
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
             console.log("get-all")
-            const {email: nickname} = req.body
+            const {nickname} = req.body
             if (!nickname) {
                 return next(ApiError.badRequest('Incorrect e-mail!'))
             }
@@ -166,11 +219,10 @@ class ProjectController {
                 return next(ApiError.badRequest('Projects are not found!'))
             }
 
-
             const projectsJSON = JSON.stringify(projects.map(it => JSON.stringify({
                 name: it.name,
                 width: it.width,
-                frames: JSON.parse(it.frameJson) as String[][],
+                frames: JSON.parse(it.frameJson) as String[],
                 description: it.description,
                 published: it.published,
                 index: it.id
@@ -181,6 +233,55 @@ class ProjectController {
             return next(e)
         }
     }
+
+    async getAllUsers(req: Request, res: Response, next: NextFunction) {
+        try {
+            const projects = await Project.findAll()
+
+
+            const projectsJSON = JSON.stringify(projects.map(it => JSON.stringify({
+                name: it.name,
+                width: it.width,
+                frames: JSON.parse(it.frameJson) as String[],
+                description: it.description,
+                published: it.published,
+                index: it.id
+            })))
+
+            return res.json({message: 'Get is successful', project: projectsJSON})
+        } catch (e) {
+            return next(e)
+        }
+    }
+
+    async getAllStarts(req: Request, res: Response, next: NextFunction) {
+        try {
+            const {startsWith} = req.body
+
+            const projects = await Project.findAll({
+                where: {
+                    name: {
+                        [Op.startsWith]: `${startsWith}`
+                    }
+                }
+            })
+
+
+            const projectsJSON = JSON.stringify(projects.map(it => JSON.stringify({
+                name: it.name,
+                width: it.width,
+                frames: JSON.parse(it.frameJson) as String[],
+                description: it.description,
+                published: it.published,
+                index: it.id
+            })))
+
+            return res.json({message: 'Get is successful', project: projectsJSON})
+        } catch (e) {
+            return next(e)
+        }
+    }
+
 
 }
 

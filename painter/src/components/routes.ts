@@ -1,8 +1,9 @@
-import {ARTWORK_ROUTE, CREATION_ROUTE, MAIN_ROUTE, PROFILE_ROUTE} from "../utils/consts";
+import {ARTWORK_ROUTE, CREATION_ROUTE, MAIN_ROUTE, PROFILE_ROUTE, SEARCH_ROUTE} from "../utils/consts";
 import MainPage from "./pages/MainPage";
 import CreationPage from "./pages/creationPage/CreationPage";
 import ProfilePage from "./pages/ProfilePage";
 import ArtworkPage from "./pages/ArtworkPage";
+import SearchPage from "./pages/SearchPage";
 
 export const authRoutes = [
     {
@@ -24,4 +25,8 @@ export const publicRoutes = [
         path: ARTWORK_ROUTE,
         Component: ArtworkPage
     },
+    {
+        path: SEARCH_ROUTE,
+        Component: SearchPage
+    }
 ]

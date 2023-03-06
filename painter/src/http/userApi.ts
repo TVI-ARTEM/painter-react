@@ -44,3 +44,10 @@ export const check = async () => {
     return jwt_decode(data.token)
 }
 
+export const getAllUsers = async () => {
+    console.log('get-all-users')
+    const {data} = await $host.get(process.env.REACT_APP_API_USER_GET_ALL as string)
+    const users = (JSON.parse(data.users) as []).map(it => JSON.parse(it) as { email: string, nickname: string })
+    return users
+}
+

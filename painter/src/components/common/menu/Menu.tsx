@@ -7,7 +7,7 @@ import UserLogo from "../images/UserLogo.png";
 import {SignIn} from "./SignIn";
 import {SignUp} from "./SignUp";
 import {useNavigate} from "react-router-dom";
-import {CREATION_ROUTE_LESS_ID, MAIN_ROUTE, PROFILE_ROUTE_LESS_ID} from "../../../utils/consts";
+import {CREATION_ROUTE_LESS_ID, MAIN_ROUTE, PROFILE_ROUTE_LESS_ID, SEARCH_ROUTE_LESS_ID} from "../../../utils/consts";
 import {User, UserContext} from "../../providers/UserProvider";
 import {login, logout, registration, updateData} from "../../../http/userApi";
 import {Project} from "../../providers/CanvasContextProvider";
@@ -30,6 +30,7 @@ export const Menu: React.FC<Props> = () => {
     const [nickname, setNickname] = useState("")
     const [projectWidth, setProjectWidth] = useState(16)
     const [projectName, setProjectName] = useState("")
+    const [startsWith, setStartsWith] = useState("")
 
     return (
         <>
@@ -46,15 +47,33 @@ export const Menu: React.FC<Props> = () => {
                         />{' '}
                         React Bootstrap
                     </Navbar.Brand>
+                    <Form className="d-flex Text-Regular ms-auto" onSubmit={() =>
+                        navigate(SEARCH_ROUTE_LESS_ID + startsWith)
+                    }>
+                        <Form.Control
+                            type="input"
+                            placeholder="Search"
+                            className="me-2"
+                            aria-label="Search"
+                            value={startsWith}
+                            onChange={(e) => setStartsWith(e.target.value)}
+                            style={{width: "500px"}}
+                        />
+                        <Button variant="light" onClick={() => {
+                            navigate(SEARCH_ROUTE_LESS_ID + startsWith)
+                        }
+                        }>Search</Button>
+                    </Form>
                     {
                         !isAuth && (
                             <>
-                                <div className={"ms-auto"}
-                                     onClick={() => {
-                                         setShowSignIn(true)
-                                     }}
-                                     onDragStart={e => e.preventDefault()}
-                                     style={{marginRight: "10px", cursor: "pointer"}}>
+                                <div
+                                    className={"ms-auto"}
+                                    onClick={() => {
+                                        setShowSignIn(true)
+                                    }}
+                                    onDragStart={e => e.preventDefault()}
+                                    style={{marginRight: "10px", cursor: "pointer"}}>
                                     <SignIn/>
                                 </div>
                                 <div
@@ -70,9 +89,10 @@ export const Menu: React.FC<Props> = () => {
                         )
                     }
 
+
                     {
                         isAuth && (
-                            <Navbar.Brand className={"Text-Header2 dropdown"}
+                            <Navbar.Brand className={"Text-Header2 dropdown ms-auto"}
                                           style={{marginRight: "50px", cursor: "pointer"}}
                                           onClick={() => {
                                           }
@@ -293,7 +313,7 @@ export const Menu: React.FC<Props> = () => {
 
                             <ListGroup>
                                 {
-                                    Array(4).fill(0).map((val, index) =>
+                                    Array(3).fill(0).map((val, index) =>
                                         <ListGroup.Item
                                             key={index}
                                             style={{

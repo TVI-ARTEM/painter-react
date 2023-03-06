@@ -42,7 +42,7 @@ export const Animation: React.FC = () => {
                             for (let row = 0; row < project.width; row++) {
                                 for (let column = 0; column < project.width; column++) {
                                     const indexCell = row * project.width + column;
-                                    // @ts-ignore
+                                    // @ts-ignorex
                                     const color = project.frames.at(index).at(indexCell) as String
                                     ctx.fillStyle = color === "-1" ? `rgba(255, 255, 255, 0)` :color.toString();
                                     ctx.fillRect(column * pixelWidth, row * pixelWidth, pixelWidth, pixelWidth)
@@ -56,6 +56,7 @@ export const Animation: React.FC = () => {
                     }
                 }
             }
+            console.log(urls)
 
             const options = {
                 images: urls,
@@ -142,11 +143,12 @@ export const Animation: React.FC = () => {
 
                     <br/>
                     <div style={{
-                        height: "450px",
+                        height: "400px",
                         width: "100%",
                         overflow: "auto",
                         display: "flex",
-                        flexDirection: "column"
+                        flexDirection: "column",
+                        marginBottom: "50px"
                     }}>
                         {
                             project.frames.map((it, index) =>

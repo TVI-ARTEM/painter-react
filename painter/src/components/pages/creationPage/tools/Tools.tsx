@@ -12,6 +12,9 @@ import {ZoomInTool} from "./ZoomInTool";
 import {ZoomOutTool} from "./ZoomOutTool";
 import {PippeteTool} from "./PippeteTool";
 import {Button, Col, Form, Modal, Row, Stack} from "react-bootstrap";
+import {PublishTool} from "./PublishTool";
+import {login} from "../../../../http/userApi";
+import {User} from "../../../providers/UserProvider";
 
 function hexToRgb(hex: String) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.toString());
@@ -44,9 +47,12 @@ export const Tools: React.FC = () => {
         setRedoHistory,
     } = useContext(CanvasContext)
     const [showPallet, setShowPallet] = useState(false)
+    const [showPublish, setShowPublish] = useState(false)
     const [red, setRed] = useState(0)
     const [green, setGreen] = useState(0)
     const [blue, setBlue] = useState(0)
+    const [title, setTitle] = useState("")
+    const [description, setDescription] = useState("")
 
     function applyHistory(history: History, project: Project, setProject: (value: (((prevState: Project) => Project) | Project)) => void, setCurrentFrame: (value: (((prevState: number) => number) | number)) => void) {
         if (history.type === HistoryType.ChangeColor) {
@@ -198,6 +204,16 @@ export const Tools: React.FC = () => {
                     <ZoomOutTool/>
                 </button>
 
+                <button className={"Tools-items Tools-button"} onClick={
+                    () => {
+                        setTitle(project.name)
+                        setDescription(project.description)
+                        setShowPublish(true)
+                    }
+                }>
+                    <PublishTool/>
+                </button>
+
             </div>
 
             <Modal show={showPallet} onHide={() => {
@@ -284,6 +300,58 @@ export const Tools: React.FC = () => {
                         setCurrentColor(rgbToHex(red, green, blue))
                         setShowPallet(false)
                     }}>Save</Button>
+                </Modal.Footer>
+            </Modal>
+
+
+            <Modal show={showPublish} onHide={() => {
+                setDescription("")
+                setTitle("")
+                setShowPublish(false)
+            }}
+                   aria-labelledby="contained-modal-title-vcenter"
+                   centered
+            >
+                <Modal.Header closeButton style={{color: "black"}} className={"Text-Regular"}>
+                    Publish
+                </Modal.Header>
+                <Modal.Body>
+                    <Stack style={{textAlign: "center", alignSelf: "center", alignItems: "center", display: "flex"}}>
+                        <label className={'Text-Regular'}>
+                            Title:
+                        </label>
+
+                        <input type={'text'} placeholder={'Enter title'}
+                               className={'form-control Text-Regular'}
+                               onChange={(event) => setTitle(event.target.value)}
+                               required
+                               value={title}
+                               multiple={false}
+                        ></input>
+                        <label className={'Text-Regular'}>
+                            Description:
+                        </label>
+                        <input type={'text'} placeholder={'Enter Description'}
+                               className={'form-control Text-Regular'}
+                               multiple={true}
+                               value={description}
+                               onChange={(event) => setDescription(event.target.value)}
+                               required></input>
+                    </Stack>
+
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="dark" onClick={() => {
+                        if (title.length < 3 || description.length < 3) {
+                            return
+                        }
+                        let newProj = Object.assign({}, project)
+                        newProj.name = title
+                        newProj.description = description
+                        newProj.published = true
+                        setProject(newProj)
+                        setShowPublish(false)
+                    }} className={"Text-Regular"}>Publish</Button>
                 </Modal.Footer>
             </Modal>
         </>

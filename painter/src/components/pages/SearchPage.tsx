@@ -5,23 +5,19 @@ import {useNavigate, useParams} from "react-router-dom";
 import {Menu} from "../common/menu";
 import UserLogo from "../common/images/UserLogo.png";
 import {UserContext} from "../providers/UserProvider";
-import {getAllProjects, remove} from "../../http/projectApi";
+import {getAllProjects, getAllProjectsStarts, remove} from "../../http/projectApi";
 import {Project} from "../providers/CanvasContextProvider";
 import {ARTWORK_ROUTE_LESS_ID, CREATION_ROUTE_LESS_ID, MAIN_ROUTE, PROFILE_ROUTE_LESS_ID} from "../../utils/consts";
 import Dummy from "../common/images/vorona.png"
 
-const {createGIF} = require("gifshot")
 
-const ProfilePage = observer(() => {
+const SearchPage = observer(() => {
     const {id} = useParams()
     const navigate = useNavigate()
-    const {user} = useContext(UserContext)
-    const [nickname, setNickname] = useState("")
     const [projects, setProjects] = useState<Project[]>([]);
     useEffect(() => {
-        getAllProjects(id as string).then(data => {
-            setProjects(data.projects)
-            setNickname(data.userNickname)
+        getAllProjectsStarts(id as string).then(data => {
+            setProjects(data)
         }).catch(error => {
             console.log(error)
             navigate(MAIN_ROUTE)
@@ -64,22 +60,9 @@ const ProfilePage = observer(() => {
         <div style={{backgroundColor: "#DFDFDF"}}>
             <Menu/>
             <Container fluid style={{textAlign: "center", marginTop: "50px"}}>
-                <div className={"Text-Header1"} style={{alignItems: "center", fontSize: "60px"}}>
-                    {id}
-                    <img
-                        alt=""
-                        src={UserLogo}
-                        width="100"
-                        height="100"
-                        className="d-inline-block align-top"
-
-                        style={{
-                            transform: "scaleX(-1)",
-                            backgroundColor: "#F0F0F0",
-                            borderRadius: "50px",
-                            marginLeft: "20px"
-                        }}
-                    />
+                <div className={"Text-Header2"}
+                     style={{textAlign: "center"}}>
+                    Projects starts with {id}:
                 </div>
 
                 <div style={{
@@ -89,7 +72,7 @@ const ProfilePage = observer(() => {
                     marginTop: "20px"
                 }}
                 > {
-                    projects.filter(it => user.nickname === nickname || it.published).map((it, index) => <div
+                    projects.filter(it => it.published).map((it, index) => <div
                         style={{
                             backgroundColor: "#EFEFEF",
                             width: "90%",
@@ -111,36 +94,6 @@ const ProfilePage = observer(() => {
                                      navigate(ARTWORK_ROUTE_LESS_ID + it.index)
                                  }
                                  }/>
-                            {
-                                id === user.nickname && (
-                                    <>
-                                        <div className={"Text-Regular"}
-                                             onClick={() => {
-                                                 navigate(CREATION_ROUTE_LESS_ID + it.index)
-
-                                             }
-                                             }
-                                             style={{color: "blue", cursor: "pointer"}}>Edit
-                                        </div>
-                                        <div
-                                            onClick={() => {
-                                                remove(it.index, user.email).catch(error => console.log(error.response.data))
-                                                    .finally(() => {
-                                                        getAllProjects(id as string).then(data => {
-                                                            setProjects(data.projects)
-                                                            setNickname(data.userNickname)
-                                                        }).catch(error => {
-                                                            console.log(error)
-                                                            navigate(MAIN_ROUTE)
-                                                        })
-                                                    })
-                                            }
-                                            }
-                                            className={"Text-Regular"} style={{color: "red", cursor: "pointer"}}>Remove
-                                        </div>
-                                    </>
-                                )
-                            }
 
                         </Container>
                     </div>)
@@ -151,4 +104,4 @@ const ProfilePage = observer(() => {
         </div>)
 })
 
-export default ProfilePage;
+export default SearchPage;
