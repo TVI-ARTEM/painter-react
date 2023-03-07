@@ -19,6 +19,12 @@ export const Project = sequelize.define('project', {
     published: {type: DataTypes.BOOLEAN}
 })
 
+export const Preview = sequelize.define('preview', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    preview: {type: DataTypes.TEXT},
+    gif: {type: DataTypes.TEXT},
+})
+
 export const Tag = sequelize.define('tag', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING},
@@ -35,6 +41,10 @@ Project.belongsTo(User)
 Project.hasMany(Tag)
 Tag.belongsTo(Project)
 
+Project.hasMany(Preview)
+Preview.belongsTo(Project)
+
+
 Project.hasMany(Like)
 Like.belongsTo(Project)
 
@@ -44,6 +54,7 @@ Like.belongsTo(User)
 module.exports = {
     User,
     Project,
+    Preview,
     Tag,
     Like
 }

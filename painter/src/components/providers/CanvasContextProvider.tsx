@@ -2,7 +2,7 @@ import React, {createContext, Dispatch, SetStateAction, useContext, useEffect, u
 import {useNavigate} from "react-router-dom";
 import {MAIN_ROUTE} from "../../utils/consts";
 import {UserContext} from "./UserProvider";
-import {get, update} from "../../http/projectApi";
+import {get, update, updateTags} from "../../http/projectApi";
 
 type CanvasContextProviderProps = {
     children: React.ReactNode,
@@ -42,6 +42,8 @@ export interface History {
 interface CanvasContextType {
     project: Project
     setProject: Dispatch<SetStateAction<Project>>
+    tags: String[]
+    setTags: Dispatch<SetStateAction<String[]>>
     currentFrame: number
     setCurrentFrame: Dispatch<SetStateAction<number>>
     zoom: number
@@ -61,10 +63,10 @@ export const CanvasContext = createContext({} as CanvasContextType)
 
 export const CanvasContextProvider = ({children, id}: CanvasContextProviderProps) => {
     const navigate = useNavigate()
-    const {user} = useContext(UserContext)
+    const {user, isAuth} = useContext(UserContext)
     const [isInitialized, setIsInitialized] = useState(false)
     useEffect(() => {
-        get(+id).then(data => {
+        get(isAuth ? user.nickname : "-", +id).then(data => {
             if (data.userNickname !== user.nickname) {
                 navigate(MAIN_ROUTE)
             }
@@ -90,20 +92,26 @@ export const CanvasContextProvider = ({children, id}: CanvasContextProviderProps
     const [currentColor, setCurrentColor] = useState<String>("#FFFFAA")
     const [undoHistory, setUndoHistory] = useState<History[]>([])
     const [redoHistory, setRedoHistory] = useState<History[]>([])
-
+    const [tags, setTags] = useState<String[]>([])
     useEffect(() => {
         if (isInitialized) {
             update(project, user.email).catch(() => {
                 navigate(MAIN_ROUTE)
             })
+            updateTags(tags, project.index, user.email).catch(() => {
+                navigate(MAIN_ROUTE)
+            })
         }
 
-    }, [project, isInitialized])
+    }, [project, isInitialized, tags])
 
 
     const value = {
         project,
         setProject,
+
+        tags,
+        setTags,
 
         currentFrame,
         setCurrentFrame,

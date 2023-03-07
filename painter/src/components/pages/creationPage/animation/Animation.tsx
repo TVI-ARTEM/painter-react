@@ -44,7 +44,7 @@ export const Animation: React.FC = () => {
                                     const indexCell = row * project.width + column;
                                     // @ts-ignorex
                                     const color = project.frames.at(index).at(indexCell) as String
-                                    ctx.fillStyle = color === "-1" ? `rgba(255, 255, 255, 0)` :color.toString();
+                                    ctx.fillStyle = color === "-1" ? `rgba(255, 255, 255, 255)` :color.toString();
                                     ctx.fillRect(column * pixelWidth, row * pixelWidth, pixelWidth, pixelWidth)
                                 }
                             }
@@ -96,17 +96,19 @@ export const Animation: React.FC = () => {
 
                     <button className={"Tools-items Tools-button"} onClick={
                         () => {
-                            let copyFrame = [...project.frames.at(currentFrame) as String[]]
-                            let newProj = Object.assign({}, project)
-                            newProj.frames.splice(currentFrame, 0, copyFrame)
-                            setUndoHistory([...undoHistory, {
-                                type: HistoryType.AddFrame,
-                                cells: copyFrame,
-                                index: currentFrame + 1
-                            }])
-                            setRedoHistory([])
-                            setProject(newProj)
-                            setCurrentFrame(currentFrame + 1)
+                            if (project.frames.length < 20) {
+                                let copyFrame = [...project.frames.at(currentFrame) as String[]]
+                                let newProj = Object.assign({}, project)
+                                newProj.frames.splice(currentFrame, 0, copyFrame)
+                                setUndoHistory([...undoHistory, {
+                                    type: HistoryType.AddFrame,
+                                    cells: copyFrame,
+                                    index: currentFrame + 1
+                                }])
+                                setRedoHistory([])
+                                setProject(newProj)
+                                setCurrentFrame(currentFrame + 1)
+                            }
                         }
                     }>
                         <AddTool/>
@@ -194,12 +196,12 @@ export const Animation: React.FC = () => {
                                         />
                                     </Col>
                                     <Col xs="2">
-                                        <Form.Control value={canvasWidth} size='sm'/>
+                                        <Form.Control value={canvasWidth} readOnly size='sm'/>
                                     </Col>
                                 </Form.Group>
                             </Form>
                             <br/>
-                            <img alt={""} src={urlToShow} style={{width: "400px", aspectRatio: 1}}/>
+                            <img alt={""} src={urlToShow} style={{width: "400px", aspectRatio: 1, border: "2px solid black"}}/>
                         </Stack>
 
                     </Modal.Body>

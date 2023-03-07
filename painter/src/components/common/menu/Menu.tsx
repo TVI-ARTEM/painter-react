@@ -48,7 +48,7 @@ export const Menu: React.FC<Props> = () => {
                         React Bootstrap
                     </Navbar.Brand>
                     <Form className="d-flex Text-Regular ms-auto" onSubmit={() =>
-                        navigate(SEARCH_ROUTE_LESS_ID + startsWith)
+                        navigate(SEARCH_ROUTE_LESS_ID + startsWith.replace("#", "<@>"))
                     }>
                         <Form.Control
                             type="input"
@@ -60,7 +60,7 @@ export const Menu: React.FC<Props> = () => {
                             style={{width: "500px"}}
                         />
                         <Button variant="light" onClick={() => {
-                            navigate(SEARCH_ROUTE_LESS_ID + startsWith)
+                            navigate(SEARCH_ROUTE_LESS_ID + startsWith.replace("#", "<@>"))
                         }
                         }>Search</Button>
                     </Form>
@@ -160,37 +160,69 @@ export const Menu: React.FC<Props> = () => {
                     Sign In
                 </Modal.Header>
                 <Modal.Body>
-                    <Stack style={{textAlign: "center", alignSelf: "center", alignItems: "center", display: "flex"}}>
-                        <label className={'Text-Regular'}>
-                            Email:
-                        </label>
+                    <Stack style={{textAlign: "center", alignSelf: "center", alignItems: "center", display: "flex"}}
+                           gap={3}>
+                        <Stack direction={"horizontal"} gap={3}>
+                            <label className={'Text-Regular'} style={{width: "115px", textAlign: "right"}}>
+                                Email:
+                            </label>
 
-                        <input type={'text'} placeholder={'Enter Email'}
-                               className={'form-control Text-Regular'}
-                               onChange={(event) => setEmail(event.target.value)}
-                               required></input>
-                        <label className={'Text-Regular'}>
-                            Password:
-                        </label>
-                        <input type={'password'} placeholder={'Enter Password'}
-                               className={'form-control Text-Regular'}
-                               onChange={(event) => setPassword(event.target.value)}
-                               required></input>
+                            <input type={'text'} placeholder={'Enter Email'}
+                                   className={'form-control Text-Regular'}
+                                   onChange={(event) => setEmail(event.target.value)}
+                                   required></input>
+                        </Stack>
+                        <Stack direction={"horizontal"} gap={3}>
+                            <label className={'Text-Regular'} style={{width: "115px", textAlign: "right"}}>
+                                Password:
+                            </label>
+                            <input type={'password'} placeholder={'Enter Password'}
+                                   className={'form-control Text-Regular'}
+                                   onChange={(event) => setPassword(event.target.value)}
+                                   required></input>
+                        </Stack>
+
                     </Stack>
 
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="dark" onClick={() => {
-                        login(email, password).then(data => {
-                            setUser(data as User)
-                            setIsAuth(true)
-                        }).catch(e => alert(e.response.data.message)).finally(() => {
-                            setNickname("")
-                            setEmail("")
-                            setPassword("")
-                            setShowSignIn(false)
-                        })
-                    }} className={"Text-Regular"}>Sign In</Button>
+                    <Stack style={{textAlign: "center", alignSelf: "center", alignItems: "center", display: "flex"}}
+                           gap={2}>
+                        <Button variant="dark" onClick={() => {
+                            login(email, password).then(data => {
+                                setUser(data as User)
+                                setIsAuth(true)
+                                setNickname("")
+                                setEmail("")
+                                setPassword("")
+                                setShowSignIn(false)
+                            }).catch(e => alert(e.response.data.message))
+                        }}
+                                style={{width: "90%"}}
+                                className={"Text-Regular"}>Sign In</Button>
+                        <Stack direction={"horizontal"} gap={3} style={{
+                            textAlign: "center",
+                            alignSelf: "center",
+                            alignItems: "center",
+                            display: "flex"
+                        }}>
+                            <label className={'Text-Regular'}>
+                                Not a member yet?
+                            </label>
+                            <label className={'Text-Regular'} style={{color: "blue", cursor: "pointer"}}
+                                   onClick={() => {
+                                       setNickname("")
+                                       setEmail("")
+                                       setPassword("")
+                                       setShowSignIn(false)
+                                       setShowSignUp(true)
+                                   }
+                                   }>
+                                Sign up here
+                            </label>
+                        </Stack>
+                    </Stack>
+
                 </Modal.Footer>
             </Modal>
 
@@ -206,47 +238,94 @@ export const Menu: React.FC<Props> = () => {
             >
                 <Modal.Header closeButton style={{color: "black"}} className={"Text-Regular"}>
                     Sign Up
+                    <img
+                        alt=""
+                        src={LogoVorona}
+                        width="48"
+                        height="48"
+                        className="d-inline-block align-top"
+                        style={{marginLeft: "10px"}}
+                    />
+                    pixelshop
                 </Modal.Header>
                 <Modal.Body>
-                    <Stack style={{textAlign: "center", alignSelf: "center", alignItems: "center", display: "flex"}}>
-                        <label className={'Text-Regular'}>
-                            Email:
-                        </label>
-                        <input type={'text'} placeholder={'Enter Email'}
-                               className={'form-control Text-Regular'}
-                               onChange={(event) => setEmail(event.target.value)}
-                               required></input>
+                    <Stack style={{textAlign: "center", alignSelf: "center", alignItems: "center", display: "flex"}}
+                           gap={3}>
+                        <Stack direction={"horizontal"} gap={3}>
+                            <label className={'Text-Regular'} style={{width: "115px", textAlign: "right"}}>
+                                Email:
+                            </label>
+                            <input type={'text'} placeholder={'Enter Email'}
+                                   className={'form-control Text-Regular'}
+                                   autoComplete={"off"}
+                                   onChange={(event) => setEmail(event.target.value)}
+                                   required></input>
+                        </Stack>
 
-                        <label className={'Text-Regular'}>
-                            Nickname:
-                        </label>
-                        <input type={'text'} placeholder={'Enter Nickname'}
-                               className={'form-control Text-Regular'}
-                               onChange={(event) => setNickname(event.target.value)}
-                               required></input>
+                        <Stack direction={"horizontal"} gap={3}>
+                            <label className={'Text-Regular'} style={{width: "115px", textAlign: "right"}}>
+                                Nickname:
+                            </label>
+                            <input type={'text'} placeholder={'Enter Nickname'}
+                                   className={'form-control Text-Regular'}
+                                   autoComplete={"off"}
+                                   onChange={(event) => setNickname(event.target.value)}
+                                   required></input>
+                        </Stack>
 
-                        <label className={'Text-Regular'}>
-                            Password:
-                        </label>
-                        <input type={'password'} placeholder={'Enter Password'}
-                               className={'form-control Text-Regular'}
-                               onChange={(event) => setPassword(event.target.value)}
-                               required></input>
+                        <Stack direction={"horizontal"} gap={3}>
+                            <label className={'Text-Regular'} style={{width: "115px", textAlign: "right"}}>
+                                Password:
+                            </label>
+                            <input type={'password'} placeholder={'Enter Password'}
+                                   className={'form-control Text-Regular'}
+                                   autoComplete={"off"}
+                                   onChange={(event) => setPassword(event.target.value)}
+                                   required></input>
+                        </Stack>
+
                     </Stack>
 
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="dark" onClick={() => {
-                        registration(email, nickname, password).then(data => {
-                            setUser(data as User)
-                            setIsAuth(true)
-                        }).catch(e => alert(e.response.data.message)).finally(() => {
-                            setNickname("")
-                            setEmail("")
-                            setPassword("")
-                            setShowSignUp(false)
-                        })
-                    }} className={"Text-Regular"}>Sign Up</Button>
+                    <Stack style={{textAlign: "center", alignSelf: "center", alignItems: "center", display: "flex"}}
+                           gap={2}>
+                        <Button variant="dark" onClick={() => {
+                            registration(email, nickname, password).then(data => {
+                                setUser(data as User)
+                                setIsAuth(true)
+                            }).catch(e => alert(e.response.data.message)).finally(() => {
+                                setNickname("")
+                                setEmail("")
+                                setPassword("")
+                                setShowSignUp(false)
+                            })
+                        }}
+                                style={{width: "90%"}}
+                                className={"Text-Regular"}>Sign Up</Button>
+
+                        <Stack direction={"horizontal"} gap={3} style={{
+                            textAlign: "center",
+                            alignSelf: "center",
+                            alignItems: "center",
+                            display: "flex"
+                        }}>
+                            <label className={'Text-Regular'}>
+                                Already have an account?
+                            </label>
+                            <label className={'Text-Regular'} style={{color: "blue", cursor: "pointer"}}
+                                   onClick={() => {
+                                       setNickname("")
+                                       setEmail("")
+                                       setPassword("")
+                                       setShowSignUp(false)
+                                       setShowSignIn(true)
+                                   }
+                                   }>
+                                Sign in here
+                            </label>
+                        </Stack>
+                    </Stack>
                 </Modal.Footer>
             </Modal>
 
@@ -289,6 +368,7 @@ export const Menu: React.FC<Props> = () => {
                             setEmail("")
                             setPassword("")
                             setShowSettings(false)
+                            window.location.reload()
                         })
                     }} className={"Text-Regular"}>Save</Button>
                 </Modal.Footer>
@@ -333,7 +413,7 @@ export const Menu: React.FC<Props> = () => {
                             <label className={'Text-Regular'}>
                                 Name:
                             </label>
-                            <input type={'text'} placeholder={'Enter New Nickname'}
+                            <input type={'text'} placeholder={'Enter Project Name'}
                                    className={'form-control Text-Regular'}
                                    onChange={(event) => setProjectName(event.target.value)}
                                    required

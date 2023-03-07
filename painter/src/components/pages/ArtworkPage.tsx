@@ -23,38 +23,22 @@ const ArtworkPage = observer(() => {
     const [isLiked, setIsLiked] = useState(false)
     const [likes, setLikes] = useState(0)
     const {user, isAuth} = useContext(UserContext)
-    const createGifCustom = (canvasWidth: number) => {
-        const canvas = document.createElement("canvas")
-        const pixelWidth = Math.floor(canvasWidth / project.width)
-        canvas.setAttribute("width", `${canvasWidth}px`)
-        canvas.setAttribute("height", `${canvasWidth}px`)
-        const ctx = canvas.getContext("2d")
-        const urls = []
-        if (ctx !== null) {
-
-            if (project.frames !== undefined) {
-
-                for (let index = 0; index < project.frames.length; index++) {
-                    ctx.clearRect(0, 0, canvasWidth, canvasWidth)
-                    if (project.frames.at(index) !== undefined) {
-                        for (let row = 0; row < project.width; row++) {
-                            for (let column = 0; column < project.width; column++) {
-                                const indexCell = row * project.width + column;
-                                // @ts-ignorex
-                                const color = project.frames.at(index).at(indexCell) as String
-                                ctx.fillStyle = color === "-1" ? `rgba(255, 255, 255, 0)` : color.toString();
-                                ctx.fillRect(column * pixelWidth, row * pixelWidth, pixelWidth, pixelWidth)
-                            }
-                        }
-                    }
-
-                    const url = canvas.toDataURL("png")
-                    urls.push(url)
-                }
-            }
-        }
 
 
+    useEffect(() => {
+        get(isAuth ? user.nickname : "-", +(id as string)).then(data => {
+            setProject(data.project)
+            setIsLiked(data.liked)
+            setLikes(data.likes)
+            createGifCustom(data.gif, 512)
+            setUserNickname(data.userNickname)
+        }).catch(() => {
+            navigate(MAIN_ROUTE)
+        })
+
+    }, [user, isAuth, id])
+
+    const createGifCustom = (urls: String[], canvasWidth: number) => {
         const options = {
             images: urls,
             gifWidth: canvasWidth,
@@ -63,6 +47,7 @@ const ArtworkPage = observer(() => {
             frameDuration: 0.01,
             sampleInterval: 10,
         };
+        console.log(urls)
         createGIF(options, (obj: any) => {
             if (!obj.error) {
                 setUrlToShow(obj.image)
@@ -70,25 +55,6 @@ const ArtworkPage = observer(() => {
         });
     }
 
-    useEffect(() => {
-        get(+(id as string)).then(data => {
-            setProject(data.project)
-            setIsLiked(data.liked)
-            setLikes(data.likes)
-            setUserNickname(data.userNickname)
-        }).catch(() => {
-            navigate(MAIN_ROUTE)
-        })
-
-    }, [user, id])
-
-    useEffect(() => {
-        try {
-            createGifCustom(512)
-        } catch (error: any) {
-            console.log(error.response.data)
-        }
-    }, [project])
 
     return (
         <div style={{backgroundColor: "#DFDFDF"}}>
@@ -125,10 +91,9 @@ const ArtworkPage = observer(() => {
                                         textAlign: "left", alignItems: "center",
                                         marginTop: "10px", cursor: "pointer"
                                     }} onClick={() => {
-                                        setIsLiked(!isLiked)
-
                                         if (isAuth) {
                                             like(project.index, user.nickname).then(data => {
+                                                setIsLiked(!isLiked)
                                                 setLikes(data.likes)
                                             })
                                         }

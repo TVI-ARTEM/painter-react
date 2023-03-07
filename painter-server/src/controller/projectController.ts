@@ -1,14 +1,18 @@
 import {Request, Response, NextFunction} from 'express';
-import {User, Project, Like} from '../models/models';
+import {User, Project, Like, Preview, Tag} from '../models/models';
 import ApiError from "../error/ApiError";
-import {Op, where} from "sequelize";
+import {Op} from "sequelize";
+import {Json} from "sequelize/lib/utils";
+
+const lzw = require('node-lzw')
+const {createGIF} = require("gifshot")
 
 
 class ProjectController {
 
     async create(req: Request, res: Response, next: NextFunction) {
         try {
-            const {email, name, description, width, frames, published} = req.body
+            const {email, name, description, width, frames, published, preview} = req.body
             if (!email) {
                 return next(ApiError.badRequest('Incorrect e-mail!'))
             }
@@ -28,12 +32,16 @@ class ProjectController {
             if (!frames) {
                 return next(ApiError.badRequest('Incorrect frames!'))
             }
+            if (!preview) {
+                return next(ApiError.badRequest('Incorrect preview!'))
+            }
+
             const user = await User.findOne({where: {email: email}})
             if (!user) {
                 return next(ApiError.badRequest('User is not found!'))
             }
 
-            //const urls = JSON.stringify(createGifCustom(width, JSON.parse(frames) as String[][]))
+            const previewURls = JSON.parse(lzw.decode(preview)) as String[]
 
             const project = await Project.create({
                 name: name,
@@ -45,6 +53,13 @@ class ProjectController {
             }).catch(error => {
                 next(error)
             })
+
+            await Preview.create({
+                preview: previewURls[0],
+                gif: JSON.stringify(previewURls),
+                projectId: project.id
+            })
+
             return res.json({message: 'Creation is successful', projectId: project.id})
 
         } catch (e) {
@@ -55,7 +70,7 @@ class ProjectController {
     async update(req: Request, res: Response, next: NextFunction) {
         try {
             console.log("update")
-            const {email, name, description, width, frames, published, id} = req.body
+            const {email, name, description, width, frames, published, id, preview} = req.body
             if (!email) {
                 return next(ApiError.badRequest('Incorrect e-mail!'))
             }
@@ -75,6 +90,9 @@ class ProjectController {
             if (!frames) {
                 return next(ApiError.badRequest('Incorrect frames!'))
             }
+            if (!preview) {
+                return next(ApiError.badRequest('Incorrect preview!'))
+            }
             const user = await User.findOne({where: {email: email}})
             if (!user) {
                 return next(ApiError.badRequest('User is not found!'))
@@ -83,7 +101,7 @@ class ProjectController {
             if (!project) {
                 return next(ApiError.badRequest('Project is not found!'))
             }
-
+            const previewURls = JSON.parse(lzw.decode(preview)) as String[]
 
             await Project.update({
                 name: name,
@@ -92,8 +110,53 @@ class ProjectController {
                 description: description,
                 published: published,
             }, {where: {userId: user.id, id: id}})
+            await Preview.update({
+                preview: previewURls[0],
+                gif: JSON.stringify(previewURls),
+            }, {where: {projectId: id}})
+
 
             return res.json({message: 'Update is successful'})
+
+        } catch (e) {
+            return next(e)
+        }
+    }
+
+    async updateTags(req: Request, res: Response, next: NextFunction) {
+        try {
+            console.log("update-tags")
+            const {email, projectId, tags} = req.body
+            if (!email) {
+                return next(ApiError.badRequest('Incorrect e-mail!'))
+            }
+
+            if (!projectId) {
+                return next(ApiError.badRequest('Incorrect projectId!'))
+            }
+
+            if (!tags) {
+                return next(ApiError.badRequest('Incorrect tags!'))
+            }
+
+
+            const project = await Project.findOne({where: {id: projectId}})
+            if (!project) {
+                return next(ApiError.badRequest('Project is not found!'))
+            }
+
+            const tagsParsed = JSON.parse(tags) as String[]
+            await Tag.destroy({where: {projectId: project.id}})
+
+            for (const tag of tagsParsed) {
+                await Tag.create({
+                    name: tag,
+                    projectId: project.id
+                })
+            }
+
+
+            return res.json({message: 'Update tags is successful'})
 
         } catch (e) {
             return next(e)
@@ -118,6 +181,8 @@ class ProjectController {
             }
 
             await Project.destroy({where: {userId: user.id, id: id}})
+            await Preview.destroy({where: {id: id}})
+            await Like.destroy({where: {id: id}})
 
             return res.json({message: 'Delete is successful'})
 
@@ -129,7 +194,7 @@ class ProjectController {
     async get(req: Request, res: Response, next: NextFunction) {
         try {
             console.log("get")
-            const {id} = req.body
+            const {nickname, id} = req.body
 
 
             const project = await Project.findOne({where: {id: id}})
@@ -145,19 +210,31 @@ class ProjectController {
                 index: project.id
             })
 
-            const user = await User.findOne({where: {id: project.userId}})
+            const user = await User.findOne({where: {nickname: nickname}})
+            const author = await User.findOne({where: {id: project.userId}})
+
             const likes = await Like.findAll({where: {projectId: project.id}})
-            const liked = await Like.findOne({where: {projectId: project.id, userId: user.id}})
-            let liked_res = true
-            if (!liked) {
-                liked_res = false
+            let liked_res = false
+            console.log(user)
+            if (user) {
+                const liked = await Like.findOne({where: {projectId: project.id, userId: user.id}})
+                console.log(liked)
+                if (liked) {
+                    liked_res = true
+                }
+
             }
+            console.log(liked_res)
+
+            const preview = await Preview.findOne({where: {projectId: id}})
             return res.json({
                 message: 'Get is successful',
                 project: projectJson,
-                nickname: user.nickname,
+                nickname: author.nickname,
                 likes: likes.length,
-                liked: liked_res
+                liked: liked_res,
+                preview: preview.preview,
+                gif: JSON.parse(preview.gif) as String[]
             })
         } catch (e) {
             return next(e)
@@ -218,7 +295,15 @@ class ProjectController {
             if (!projects) {
                 return next(ApiError.badRequest('Projects are not found!'))
             }
-
+            const previews = []
+            for (const project of projects) {
+                const preview = await Preview.findOne({where: {projectId: project.id}})
+                previews.push(JSON.stringify({
+                    preview: preview.preview,
+                    gif: JSON.parse(preview.gif) as String[],
+                    projectId: preview.projectId,
+                }))
+            }
             const projectsJSON = JSON.stringify(projects.map(it => JSON.stringify({
                 name: it.name,
                 width: it.width,
@@ -228,7 +313,13 @@ class ProjectController {
                 index: it.id
             })))
 
-            return res.json({message: 'Get is successful', project: projectsJSON, nickname: user.nickname})
+
+            return res.json({
+                message: 'Get is successful',
+                project: projectsJSON,
+                previews: JSON.stringify(previews),
+                nickname: user.nickname
+            })
         } catch (e) {
             return next(e)
         }
@@ -248,7 +339,17 @@ class ProjectController {
                 index: it.id
             })))
 
-            return res.json({message: 'Get is successful', project: projectsJSON})
+            const previews = []
+            for (const project of projects) {
+                const preview = await Preview.findOne({where: {projectId: project.id}})
+                previews.push(JSON.stringify({
+                    preview: preview.preview,
+                    gif: JSON.parse(preview.gif) as String[],
+                    projectId: preview.projectId,
+                }))
+            }
+
+            return res.json({message: 'Get is successful', project: projectsJSON, previews: JSON.stringify(previews)})
         } catch (e) {
             return next(e)
         }
@@ -256,16 +357,30 @@ class ProjectController {
 
     async getAllStarts(req: Request, res: Response, next: NextFunction) {
         try {
+            console.log("get-starts")
             const {startsWith} = req.body
+            if (!startsWith || (startsWith as string).length === 0) {
+                return next(ApiError.badRequest('Incorrect startsWith!'))
+            }
+            let projects = []
 
-            const projects = await Project.findAll({
-                where: {
-                    name: {
-                        [Op.startsWith]: `${startsWith}`
-                    }
+
+            if ((startsWith as string).startsWith("#")) {
+                const tags = await Tag.findAll({where: {name: startsWith}})
+                for (const tag of tags) {
+                    const project = await Project.findOne({where: {id: tag.projectId}})
+                    projects.push(project)
                 }
-            })
-
+                projects = [...new Set(projects)]
+            } else {
+                projects = await Project.findAll({
+                    where: {
+                        name: {
+                            [Op.startsWith]: `${startsWith}`
+                        }
+                    }
+                })
+            }
 
             const projectsJSON = JSON.stringify(projects.map(it => JSON.stringify({
                 name: it.name,
@@ -276,7 +391,17 @@ class ProjectController {
                 index: it.id
             })))
 
-            return res.json({message: 'Get is successful', project: projectsJSON})
+            const previews = []
+            for (const project of projects) {
+                const preview = await Preview.findOne({where: {projectId: project.id}})
+                previews.push(JSON.stringify({
+                    preview: preview.preview,
+                    gif: JSON.parse(preview.gif) as String[],
+                    projectId: preview.projectId,
+                }))
+            }
+
+            return res.json({message: 'Get is successful', project: projectsJSON, previews: JSON.stringify(previews)})
         } catch (e) {
             return next(e)
         }

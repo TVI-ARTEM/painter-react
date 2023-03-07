@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import "./Tools.css";
 
 import {UndoTool} from "./UndoTool";
@@ -11,10 +11,9 @@ import {PalletTool} from "./PalletTool";
 import {ZoomInTool} from "./ZoomInTool";
 import {ZoomOutTool} from "./ZoomOutTool";
 import {PippeteTool} from "./PippeteTool";
-import {Button, Col, Form, Modal, Row, Stack} from "react-bootstrap";
+import {Button, Col, Form, ListGroup, Modal, Row, Stack} from "react-bootstrap";
 import {PublishTool} from "./PublishTool";
-import {login} from "../../../../http/userApi";
-import {User} from "../../../providers/UserProvider";
+import Remove from "../../../common/images/Remove.svg";
 
 function hexToRgb(hex: String) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.toString());
@@ -34,6 +33,8 @@ export const Tools: React.FC = () => {
     const {
         project,
         setProject,
+        tags,
+        setTags,
         setCurrentFrame,
         setTool,
         tool,
@@ -53,6 +54,8 @@ export const Tools: React.FC = () => {
     const [blue, setBlue] = useState(0)
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
+    const [tag, setTag] = useState("")
+    const [currentTags, setCurrentTags] = useState<String[]>([])
 
     function applyHistory(history: History, project: Project, setProject: (value: (((prevState: Project) => Project) | Project)) => void, setCurrentFrame: (value: (((prevState: number) => number) | number)) => void) {
         if (history.type === HistoryType.ChangeColor) {
@@ -209,6 +212,8 @@ export const Tools: React.FC = () => {
                         setTitle(project.name)
                         setDescription(project.description)
                         setShowPublish(true)
+                        setTag("")
+                        setCurrentTags(tags)
                     }
                 }>
                     <PublishTool/>
@@ -251,7 +256,7 @@ export const Tools: React.FC = () => {
                                     />
                                 </Col>
                                 <Col xs="2">
-                                    <Form.Control value={red} size='sm'/>
+                                    <Form.Control value={red} readOnly size='sm'/>
                                 </Col>
                             </Form.Group>
 
@@ -269,7 +274,7 @@ export const Tools: React.FC = () => {
                                     />
                                 </Col>
                                 <Col xs="2">
-                                    <Form.Control value={green} size='sm'/>
+                                    <Form.Control value={green} readOnly size='sm'/>
                                 </Col>
                             </Form.Group>
 
@@ -287,7 +292,7 @@ export const Tools: React.FC = () => {
                                     />
                                 </Col>
                                 <Col xs="2">
-                                    <Form.Control value={blue} size='sm'/>
+                                    <Form.Control value={blue} readOnly size='sm'/>
                                 </Col>
                             </Form.Group>
                         </Form>
@@ -307,7 +312,10 @@ export const Tools: React.FC = () => {
             <Modal show={showPublish} onHide={() => {
                 setDescription("")
                 setTitle("")
+                setTag("")
+                setCurrentTags([])
                 setShowPublish(false)
+
             }}
                    aria-labelledby="contained-modal-title-vcenter"
                    centered
@@ -316,7 +324,8 @@ export const Tools: React.FC = () => {
                     Publish
                 </Modal.Header>
                 <Modal.Body>
-                    <Stack style={{textAlign: "center", alignSelf: "center", alignItems: "center", display: "flex"}}>
+                    <Stack style={{textAlign: "center", alignSelf: "center", alignItems: "center", display: "flex"}}
+                           gap={2}>
                         <label className={'Text-Regular'}>
                             Title:
                         </label>
@@ -331,13 +340,61 @@ export const Tools: React.FC = () => {
                         <label className={'Text-Regular'}>
                             Description:
                         </label>
-                        <input type={'text'} placeholder={'Enter Description'}
+                        <textarea placeholder={'Enter Description'}
+                                  className={'form-control Text-Regular'}
+                                  value={description}
+                                  onChange={(event) => setDescription(event.target.value)}
+                                  required></textarea>
+
+                        <label className={'Text-Regular'}>
+                            New Tag
+                        </label>
+                        <input type={'text'} placeholder={'Enter new tag'}
                                className={'form-control Text-Regular'}
-                               multiple={true}
-                               value={description}
-                               onChange={(event) => setDescription(event.target.value)}
-                               required></input>
+                               onChange={(event) => setTag(event.target.value)}
+                               required
+                               value={tag}
+                               multiple={false}
+                        ></input>
+                        <Button variant={"dark"} onClick={() => {
+                            if (tag.length > 0 && !currentTags.includes(`#${tag}`)) {
+                                setCurrentTags([...currentTags, `#${tag}`])
+                            }
+                        }
+                        }>ADD TAG</Button>
+                        <label className={'Text-Regular'}>
+                            TAGS
+                        </label>
+                        <Stack gap={2}>
+                            {
+                                currentTags.map((it, index) =>
+                                    <Stack direction={"horizontal"} className={"Text-Regular"} key={index}>
+                                        {it}
+                                        <img
+                                            alt=""
+                                            src={Remove}
+                                            width="48"
+                                            height="48"
+                                            className="d-inline-block ms-auto"
+                                            onClick={() => {
+                                                console.log(currentTags)
+                                                currentTags.splice(index, 1)
+                                                console.log(currentTags)
+                                                setCurrentTags(currentTags)
+                                                setTag(tag + "")
+                                            }
+                                            }
+                                            style={{
+                                                transform: "scaleX(-1)",
+                                                marginLeft: "10px",
+                                                cursor: "pointer"
+                                            }}/>
+                                    </Stack>
+                                )
+                            }
+                        </Stack>
                     </Stack>
+
 
                 </Modal.Body>
                 <Modal.Footer>
@@ -350,6 +407,7 @@ export const Tools: React.FC = () => {
                         newProj.description = description
                         newProj.published = true
                         setProject(newProj)
+                        setTags(currentTags)
                         setShowPublish(false)
                     }} className={"Text-Regular"}>Publish</Button>
                 </Modal.Footer>

@@ -7,10 +7,9 @@ import UserLogo from "../common/images/UserLogo.png";
 import {UserContext} from "../providers/UserProvider";
 import {getAllProjects, remove} from "../../http/projectApi";
 import {Project} from "../providers/CanvasContextProvider";
-import {ARTWORK_ROUTE_LESS_ID, CREATION_ROUTE_LESS_ID, MAIN_ROUTE, PROFILE_ROUTE_LESS_ID} from "../../utils/consts";
+import {ARTWORK_ROUTE_LESS_ID, CREATION_ROUTE_LESS_ID, MAIN_ROUTE} from "../../utils/consts";
 import Dummy from "../common/images/vorona.png"
 
-const {createGIF} = require("gifshot")
 
 const ProfilePage = observer(() => {
     const {id} = useParams()
@@ -18,9 +17,11 @@ const ProfilePage = observer(() => {
     const {user} = useContext(UserContext)
     const [nickname, setNickname] = useState("")
     const [projects, setProjects] = useState<Project[]>([]);
+    const [previews, setPreviews] = useState<{preview: string, gif: string[], projectId: number}[]>([]);
     useEffect(() => {
         getAllProjects(id as string).then(data => {
             setProjects(data.projects)
+            setPreviews(data.previews)
             setNickname(data.userNickname)
         }).catch(error => {
             console.log(error)
@@ -28,37 +29,11 @@ const ProfilePage = observer(() => {
         })
     }, [id])
 
+    useEffect(() => {
+        console.log(previews)
+    }, [previews])
 
-    const createGifCustom = (canvasWidth: number, project: Project) => {
-        const canvas = document.createElement("canvas")
-        const pixelWidth = Math.floor(canvasWidth / project.width)
-        canvas.setAttribute("width", `${canvasWidth}px`)
-        canvas.setAttribute("height", `${canvasWidth}px`)
-        const ctx = canvas.getContext("2d")
-        if (ctx !== null) {
-            if (project.frames !== undefined) {
-                for (let index = 0; index < project.frames.length; index++) {
-                    ctx.clearRect(0, 0, canvasWidth, canvasWidth)
-                    if (project.frames.at(index) !== undefined) {
-                        for (let row = 0; row < project.width; row++) {
-                            for (let column = 0; column < project.width; column++) {
-                                const indexCell = row * project.width + column;
-                                // @ts-ignore
-                                const color = project.frames.at(index).at(indexCell) as String
-                                ctx.fillStyle = color === "-1" ? `rgba(255, 255, 255, 0)` : color.toString();
-                                ctx.fillRect(column * pixelWidth, row * pixelWidth, pixelWidth, pixelWidth)
-                            }
-                        }
-                    }
 
-                    return canvas.toDataURL("png")
-
-                }
-            }
-        }
-
-        return Dummy
-    }
 
     return (
         <div style={{backgroundColor: "#DFDFDF"}}>
@@ -81,7 +56,10 @@ const ProfilePage = observer(() => {
                         }}
                     />
                 </div>
-
+                <div className={"Text-Header2"}
+                     style={{textAlign: "center", marginTop: "25px"}}>
+                    Projects
+                </div>
                 <div style={{
                     display: "inline-grid",
                     gridTemplateColumns: `repeat(6,1fr)`,
@@ -105,7 +83,7 @@ const ProfilePage = observer(() => {
                         <Container fluid style={{marginBottom: "10px", textAlign: "center"}}>
                             <div className={"Text-Header2"} style={{fontWeight: "bold"}}>{it.name.substring(0, 15)}</div>
                             <div className={"Text-Regular"}>{it.description.substring(0, 25)}</div>
-                            <img width={"100%"} src={`${createGifCustom(512, it)}`}
+                            <img width={"100%"} src={`${previews.find(prev => prev.projectId === it.index )?.preview}`}
                                  style={{aspectRatio: 1, cursor: "pointer"}}
                                  onClick={() => {
                                      navigate(ARTWORK_ROUTE_LESS_ID + it.index)

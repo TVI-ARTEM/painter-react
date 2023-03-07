@@ -10,42 +10,13 @@ import {getAllProjects, getAllProjectsUsers, remove} from "../../http/projectApi
 import {Project} from "../providers/CanvasContextProvider";
 import Dummy from "../common/images/vorona.png";
 
-const createGifCustom = (canvasWidth: number, project: Project) => {
-    const canvas = document.createElement("canvas")
-    const pixelWidth = Math.floor(canvasWidth / project.width)
-    canvas.setAttribute("width", `${canvasWidth}px`)
-    canvas.setAttribute("height", `${canvasWidth}px`)
-    const ctx = canvas.getContext("2d")
-    if (ctx !== null) {
-        if (project.frames !== undefined) {
-            for (let index = 0; index < project.frames.length; index++) {
-                ctx.clearRect(0, 0, canvasWidth, canvasWidth)
-                if (project.frames.at(index) !== undefined) {
-                    for (let row = 0; row < project.width; row++) {
-                        for (let column = 0; column < project.width; column++) {
-                            const indexCell = row * project.width + column;
-                            // @ts-ignore
-                            const color = project.frames.at(index).at(indexCell) as String
-                            ctx.fillStyle = color === "-1" ? `rgba(255, 255, 255, 0)` : color.toString();
-                            ctx.fillRect(column * pixelWidth, row * pixelWidth, pixelWidth, pixelWidth)
-                        }
-                    }
-                }
-
-                return canvas.toDataURL("png")
-
-            }
-        }
-    }
-
-    return Dummy
-}
 
 
 const MainPage = observer(() => {
     const navigate = useNavigate()
     const [users, setUsers] = useState<{ email: string, nickname: string }[]>([])
     const [projects, setProjects] = useState<Project[]>([]);
+    const [previews, setPreviews] = useState<{preview: string, gif: string[], projectId: number}[]>([]);
 
     useEffect(() => {
         getAllUsers().then(data => {
@@ -55,7 +26,8 @@ const MainPage = observer(() => {
 
     useEffect(() => {
         getAllProjectsUsers().then(data => {
-            setProjects(data)
+            setProjects(data.projects)
+            setPreviews(data.previews)
         }).catch(error => {
             console.log(error)
             navigate(MAIN_ROUTE)
@@ -150,7 +122,7 @@ const MainPage = observer(() => {
                         <Container fluid style={{marginBottom: "10px", textAlign: "center"}}>
                             <div className={"Text-Header2"} style={{fontWeight: "bold"}}>{it.name.substring(0, 15)}</div>
                             <div className={"Text-Regular"}>{it.description.substring(0, 25)}</div>
-                            <img width={"100%"} src={`${createGifCustom(512, it)}`}
+                            <img width={"100%"} src={`${previews.find(prev => prev.projectId === it.index )?.preview}`}
                                  style={{aspectRatio: 1, cursor: "pointer"}}
                                  onClick={() => {
                                      navigate(ARTWORK_ROUTE_LESS_ID + it.index)
